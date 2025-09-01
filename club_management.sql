@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 26, 2025 at 05:32 AM
+-- Generation Time: Sep 01, 2025 at 07:01 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -36,8 +36,7 @@ CREATE TABLE `career` (
   `europa` varchar(100) DEFAULT NULL,
   `supercup` varchar(100) DEFAULT NULL,
   `european` varchar(100) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -48,13 +47,14 @@ CREATE TABLE `career` (
 
 CREATE TABLE `fixtures` (
   `id` int(11) NOT NULL,
-  `month` date NOT NULL,
+  `month` varchar(50) NOT NULL,
   `tournament_id` int(11) NOT NULL,
   `ground` enum('Home','Away','Neutral') NOT NULL,
   `score` varchar(20) DEFAULT NULL,
-  `opponent_id` int(11) NOT NULL,
-  `goal_scorers` varchar(255) DEFAULT NULL,
-  `assists` varchar(255) DEFAULT NULL,
+  `opponent_id` int(11) DEFAULT NULL,
+  `opponent` varchar(100) DEFAULT NULL,
+  `goal_scorers` text DEFAULT NULL,
+  `assists` text DEFAULT NULL,
   `man_of_the_match` varchar(100) DEFAULT NULL,
   `player_of_the_month` varchar(100) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -93,17 +93,34 @@ CREATE TABLE `head_to_head` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `matches`
+--
+
+CREATE TABLE `matches` (
+  `id` int(11) NOT NULL,
+  `tournament_id` int(11) NOT NULL,
+  `matchday` int(11) DEFAULT NULL,
+  `stage` varchar(50) DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `home_team_id` int(11) NOT NULL,
+  `away_team_id` int(11) NOT NULL,
+  `home_score` int(11) DEFAULT 0,
+  `away_score` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `objectives`
 --
 
 CREATE TABLE `objectives` (
   `id` int(11) NOT NULL,
-  `season` varchar(20) NOT NULL,
-  `league_objective` varchar(255) DEFAULT NULL,
-  `other_objectives` text DEFAULT NULL,
-  `status` enum('In Progress','Completed','Pending') DEFAULT 'Pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `season` year(4) NOT NULL,
+  `objective_type` varchar(100) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `target` varchar(100) DEFAULT NULL,
+  `status` enum('Pending','Achieved','Failed') DEFAULT 'Pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -114,11 +131,10 @@ CREATE TABLE `objectives` (
 
 CREATE TABLE `opponents` (
   `id` int(11) NOT NULL,
-  `team_id` int(11) NOT NULL,
+  `name` int(11) NOT NULL,
   `tournament_id` int(11) NOT NULL,
-  `season` int(11) NOT NULL,
-  `tournament` varchar(100) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `season` year(4) NOT NULL,
+  `tournament` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -129,15 +145,18 @@ CREATE TABLE `opponents` (
 
 CREATE TABLE `season_stats` (
   `id` int(11) NOT NULL,
-  `season` varchar(20) NOT NULL,
-  `matches` int(11) DEFAULT 0,
+  `season` year(4) NOT NULL,
+  `competition` varchar(100) DEFAULT NULL,
+  `matches_played` int(11) DEFAULT 0,
   `wins` int(11) DEFAULT 0,
   `draws` int(11) DEFAULT 0,
   `losses` int(11) DEFAULT 0,
   `goals_for` int(11) DEFAULT 0,
   `goals_against` int(11) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `clean_sheets` int(11) DEFAULT 0,
+  `top_scorer` varchar(100) DEFAULT NULL,
+  `top_assist` varchar(100) DEFAULT NULL,
+  `player_of_the_season` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -148,16 +167,14 @@ CREATE TABLE `season_stats` (
 
 CREATE TABLE `squad_hub` (
   `id` int(11) NOT NULL,
-  `overall` int(11) NOT NULL,
-  `growth` int(11) NOT NULL,
-  `final_overall` int(11) NOT NULL,
-  `age` varchar(20) NOT NULL,
-  `position` varchar(20) NOT NULL,
-  `role` varchar(50) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `status` enum('First Team','HG','U21','Academy','Youth Player') DEFAULT 'First Team',
-  `transfer_type` enum('None','Loan In','Loan Out') DEFAULT 'None',
-  `transfer_team` int(11) DEFAULT NULL
+  `player_name` varchar(100) NOT NULL,
+  `position` varchar(50) DEFAULT NULL,
+  `nationality` varchar(50) DEFAULT NULL,
+  `age` int(11) DEFAULT NULL,
+  `overall_rating` int(11) DEFAULT NULL,
+  `potential` int(11) DEFAULT NULL,
+  `joined` date DEFAULT NULL,
+  `contract_until` year(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -169,11 +186,10 @@ CREATE TABLE `squad_hub` (
 CREATE TABLE `teams` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `country` varchar(100) DEFAULT NULL,
-  `founded` year(4) DEFAULT NULL,
-  `stadium` varchar(150) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `founded_year` year(4) DEFAULT NULL,
+  `stadium` varchar(100) DEFAULT NULL,
+  `league` varchar(100) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -185,27 +201,11 @@ CREATE TABLE `teams` (
 CREATE TABLE `tournaments` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `type` varchar(50) DEFAULT NULL,
+  `type` enum('League','Cup') NOT NULL,
+  `season` year(4) NOT NULL,
   `country` varchar(100) DEFAULT NULL,
-  `season` year(4) DEFAULT NULL,
-  `format` varchar(100) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `total_teams` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tournaments`
---
-
-INSERT INTO `tournaments` (`id`, `name`, `type`, `country`, `season`, `format`, `created_at`) VALUES
-(1, 'Uefa Champions League', NULL, NULL, NULL, NULL, '2025-08-26 02:22:39'),
-(2, 'Uefa Europa League', NULL, NULL, NULL, NULL, '2025-08-26 02:22:39'),
-(3, 'Uefa Conference League', NULL, NULL, NULL, NULL, '2025-08-26 02:22:39'),
-(4, 'EFL League One', NULL, NULL, NULL, NULL, '2025-08-26 02:22:39'),
-(5, 'Championship', NULL, NULL, NULL, NULL, '2025-08-26 02:22:39'),
-(6, 'Carabao Cup', NULL, NULL, NULL, NULL, '2025-08-26 02:22:39'),
-(7, 'Emirates FA Cup', NULL, NULL, NULL, NULL, '2025-08-26 02:22:39'),
-(8, 'Bristol Cup', NULL, NULL, NULL, NULL, '2025-08-26 02:22:39'),
-(9, 'Pre-Season Cup', NULL, NULL, NULL, NULL, '2025-08-26 02:22:39');
 
 -- --------------------------------------------------------
 
@@ -215,8 +215,8 @@ INSERT INTO `tournaments` (`id`, `name`, `type`, `country`, `season`, `format`, 
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(150) NOT NULL,
   `password` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -226,8 +226,8 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'admin@gmail.com', 'admin', '2025-08-26 02:55:51', '2025-08-26 02:55:51');
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `created_at`, `updated_at`) VALUES
+(1, 'admin', 'admin@gmail.com', 'admin', '2025-08-24 15:13:31', '2025-08-24 15:13:31');
 
 --
 -- Indexes for dumped tables
@@ -244,14 +244,22 @@ ALTER TABLE `career`
 --
 ALTER TABLE `fixtures`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_tournament` (`tournament_id`),
-  ADD KEY `fk_opponent` (`opponent_id`);
+  ADD KEY `tournament_id` (`tournament_id`);
 
 --
 -- Indexes for table `head_to_head`
 --
 ALTER TABLE `head_to_head`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `matches`
+--
+ALTER TABLE `matches`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `tournament_id` (`tournament_id`),
+  ADD KEY `home_team_id` (`home_team_id`),
+  ADD KEY `away_team_id` (`away_team_id`);
 
 --
 -- Indexes for table `objectives`
@@ -263,7 +271,9 @@ ALTER TABLE `objectives`
 -- Indexes for table `opponents`
 --
 ALTER TABLE `opponents`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD KEY `tournament_id` (`tournament_id`);
 
 --
 -- Indexes for table `season_stats`
@@ -275,8 +285,7 @@ ALTER TABLE `season_stats`
 -- Indexes for table `squad_hub`
 --
 ALTER TABLE `squad_hub`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `transfer_team` (`transfer_team`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `teams`
@@ -295,7 +304,6 @@ ALTER TABLE `tournaments`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
@@ -318,6 +326,12 @@ ALTER TABLE `fixtures`
 -- AUTO_INCREMENT for table `head_to_head`
 --
 ALTER TABLE `head_to_head`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `matches`
+--
+ALTER TABLE `matches`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -354,7 +368,7 @@ ALTER TABLE `teams`
 -- AUTO_INCREMENT for table `tournaments`
 --
 ALTER TABLE `tournaments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -370,14 +384,22 @@ ALTER TABLE `users`
 -- Constraints for table `fixtures`
 --
 ALTER TABLE `fixtures`
-  ADD CONSTRAINT `fk_opponent` FOREIGN KEY (`opponent_id`) REFERENCES `opponents` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_tournament` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fixtures_ibfk_1` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `squad_hub`
+-- Constraints for table `matches`
 --
-ALTER TABLE `squad_hub`
-  ADD CONSTRAINT `squad_hub_ibfk_1` FOREIGN KEY (`transfer_team`) REFERENCES `teams` (`id`) ON DELETE SET NULL;
+ALTER TABLE `matches`
+  ADD CONSTRAINT `matches_ibfk_1` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `matches_ibfk_2` FOREIGN KEY (`home_team_id`) REFERENCES `teams` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `matches_ibfk_3` FOREIGN KEY (`away_team_id`) REFERENCES `teams` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `opponents`
+--
+ALTER TABLE `opponents`
+  ADD CONSTRAINT `opponents_ibfk_1` FOREIGN KEY (`name`) REFERENCES `teams` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `opponents_ibfk_2` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
