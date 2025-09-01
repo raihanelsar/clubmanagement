@@ -1,51 +1,63 @@
-<header class="site-navbar py-4" role="banner">
-  <div class="container">
-    <div class="d-flex align-items-center">
-      
-      <!-- Logo -->
-      <div class="site-logo">
-        <a href="index.php">
-          <img src="assets/images/logo.png" alt="Logo">
-        </a>
-      </div>
+<header id="header" class="header d-flex align-items-center px-3 px-md-4 py-2 shadow-sm bg-white position-fixed top-0 start-0 end-0 z-3">
+  <!-- Toggle untuk mobile -->
+  <i class="header-toggle d-xl-none bi bi-list fs-4 me-2 cursor-pointer text-primary"
+     role="button" aria-label="Toggle navigation"></i>
 
-      <!-- Navigation -->
-      <div class="ms-auto">
-        <nav class="site-navigation position-relative text-end" role="navigation">
-          <ul class="site-menu main-menu js-clone-nav me-auto d-none d-lg-block">
-            <?php
-              // Ambil page dari GET, default 'home'
-              $page = isset($_GET['page']) ? $_GET['page'] : 'home';
+  <!-- Logo / Brand -->
+  <a class="navbar-brand fw-bold text-primary d-block" href="?page=home">
+    <span class="d-none d-md-inline">SoccerHub</span>
+    <span class="d-md-none">SH</span>
+  </a>
 
-              // Daftar menu
-              $menus = [
-                "home"     => ["label" => "Home",     "url" => "index.php?page=home"],
-                "matches"  => ["label" => "Matches",  "url" => "index.php?page=matches"],
-                "players"  => ["label" => "Players",  "url" => "index.php?page=players"],
-                "blog"     => ["label" => "Blog",     "url" => "index.php?page=blog"],
-                "contact"  => ["label" => "Contact",  "url" => "index.php?page=contact"],
-              ];
+  <!-- Navigasi Utama -->
+  <nav id="navmenu" class="navmenu ms-auto">
+    <ul class="d-flex flex-row gap-1 mb-0 list-unstyled">
+      <?php
+      $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 
-              // Loop menu
-              foreach ($menus as $key => $menu) {
-                $active = ($page === $key) ? "active" : "";
-                echo '
-                  <li class="'.$active.'">
-                    <a href="'.$menu['url'].'" class="nav-link">'.$menu['label'].'</a>
-                  </li>
-                ';
-              }
-            ?>
-          </ul>
-        </nav>
+      $menus = [
+        'home' => [
+          'url' => '?page=home',
+          'label' => 'Home'
+        ],
+        'office' => [
+          'url' => '?page=office',
+          'label' => 'Office'
+        ],
+        'squad' => [
+          'url' => '?page=squad',
+          'label' => 'Squad'
+        ],
+        'transfers' => [
+          'url' => '?page=transfers',
+          'label' => 'Transfers'
+        ],
+      ];
 
-        <!-- Mobile Menu Toggle -->
-        <a href="#" 
-           class="d-inline-block d-lg-none site-menu-toggle js-menu-toggle text-white float-end">
-          <span class="icon-menu h3"></span>
-        </a>
-      </div>
-
-    </div>
-  </div>
+      foreach ($menus as $key => $menu):
+        // Gunakan str_starts_with jika PHP 8+, fallback ke strpos untuk versi lama
+        $isActive = function_exists('str_starts_with')
+          ? str_starts_with($page, $key)
+          : strpos($page, $key) === 0;
+      ?>
+        <li>
+          <a href="<?= htmlspecialchars($menu['url']) ?>"
+             class="nav-link px-3 py-2 rounded <?= $isActive ? 'text-white bg-primary fw-medium' : 'text-dark' ?>"
+             aria-current="<?= $isActive ? 'page' : '' ?>">
+            <?= htmlspecialchars($menu['label']) ?>
+          </a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  </nav>
 </header>
+
+<style>
+  .nav-link {
+    transition: all 0.2s ease;
+  }
+  .nav-link:hover {
+    background: #f1f3f5;
+    color: #0d6efd !important;
+  }
+</style>

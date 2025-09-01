@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -30,13 +29,21 @@
 
   <!-- Header -->
   <?php include 'inc/header.php'; ?>
-
+  
   <!-- Main Content -->
   <main class="main">
     <?php 
+      // Ambil parameter page dari URL, default ke 'home'
       $page = isset($_GET['page']) ? $_GET['page'] : 'home';
+
+      // Sanitize input: remove unwanted characters (prevent directory traversal)
+      $page = basename($page); // This removes any path info like '../' or 'admin/secret'
+
+      // Tentukan file yang akan di-include
       $file = "content/" . $page . ".php";
-      if (file_exists($file)) {
+      
+      // Cek apakah file ada, jika ya, include, jika tidak, tampilkan notfound
+      if (file_exists($file) && is_file($file)) {
           include $file;
       } else {
           include 'content/notfound.php';
@@ -62,8 +69,6 @@
   <script src="assets/js/jquery.fancybox.min.js"></script>
   <script src="assets/js/jquery.sticky.js"></script>
   <script src="assets/js/jquery.mb.YTPlayer.min.js"></script>
-
-  <!-- Custom Script -->
   <script src="assets/js/main.js"></script>
 
 </body>

@@ -50,7 +50,7 @@
 
       <!-- Career -->
       <div class="col-md-4">
-        <a href="?page=career-summary" class="text-decoration-none text-dark">
+        <a href="?page=career" class="text-decoration-none text-dark">
           <div class="card p-4 text-center dashboard-card">
             <div class="icon-circle bg-success"><i class="bi bi-bar-chart-fill"></i></div>
             <h5 class="fw-bold">Career</h5>
